@@ -17,4 +17,12 @@ describe('Reading cars out of the database', () => {
         done();
       });
   });
+
+  it('find a car with a particular id', (done) => {
+    Car.findOne({ _id: bmw._id })
+      .then((user) => {
+        assert(user.brand === 'BMW');
+        done();
+      })
+  })
 });
