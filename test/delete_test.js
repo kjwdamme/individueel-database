@@ -1,36 +1,36 @@
 const assert = require('assert');
-const Car = require('../src/car');
+const Advertisement = require('../src/advertisement');
 
-describe('Deleting a car', () => {
+describe('Deleting an ad', () => {
   let bmw;
 
   beforeEach((done) => {
-    bmw = new Car({ brand: 'BMW' });
+    bmw = new Advertisement({ title: 'BMW' });
     bmw.save()
       .then(() => done());
   });
 
   it('model instance remove', (done) => {
     bmw.remove()
-      .then(() => Car.findOne({ brand: 'BMW'}))
-      .then((car) => {
-        assert(car === null);
+      .then(() => Advertisement.findOne({ title: 'BMW'}))
+      .then((ad) => {
+        assert(ad === null);
         done();
       });
   });
 
   it('class method remove', (done) => {
-    Car.remove({ brand: 'BMW'})
-      .then(() => Car.findOne({ brand: 'BMW'}))
-      .then((car) => {
-        assert(car === null);
+    Advertisement.remove({ title: 'BMW'})
+      .then(() => Advertisement.findOne({ title: 'BMW'}))
+      .then((ad) => {
+        assert(ad === null);
         done();
       });
   });
 
   it('class method findAndRemove', (done) => {
-    Car.findOneAndRemove({ brand: 'BMW' })
-      .then(() => Car.findOne({ brand: 'BMW'}))
+    Advertisement.findOneAndRemove({ title: 'BMW' })
+      .then(() => Advertisement.findOne({ title: 'BMW'}))
       .then((car) => {
         assert(car === null);
         done();
@@ -38,10 +38,10 @@ describe('Deleting a car', () => {
   })
 
   it('class method findByIdAndRemove', (done) => {
-    Car.findByIdAndRemove(bmw._id)
-      .then(() => Car.findOne({ brand: 'BMW'}))
-      .then((car) => {
-        assert(car === null);
+    Advertisement.findByIdAndRemove(bmw._id)
+      .then(() => Advertisement.findOne({ title: 'BMW'}))
+      .then((ad) => {
+        assert(ad === null);
         done();
     });
   });

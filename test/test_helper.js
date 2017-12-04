@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 before((done) => {
-  mongoose.connect('mongodb://localhost/cars_test', {
+  mongoose.connect('mongodb://localhost/advertisements_test', {
       useMongoClient: true
   });
   mongoose.connection
@@ -15,7 +15,7 @@ before((done) => {
 
 
 beforeEach((done) => {
-  mongoose.connection.collections.cars.drop(() => {
+  mongoose.connection.collections.advertisements.drop(() => {
       done();
   });
 });

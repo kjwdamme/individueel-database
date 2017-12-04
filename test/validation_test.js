@@ -1,30 +1,30 @@
 const assert = require('assert');
-const Car = require('../src/car');
+const Advertisement = require('../src/advertisement');
 
 describe('Validating records', () => {
-  it('requires a brand', () => {
-    const car = new Car({ brand: undefined });
-    const validationResult = car.validateSync();
-    const { message } = validationResult.errors.brand;
+  it('requires a title', () => {
+    const ad = new Advertisement({ title: undefined });
+    const validationResult = ad.validateSync();
+    const { message } = validationResult.errors.title;
 
-    assert(message === 'Brand is required.');
+    assert(message === 'Title is required.');
   });
 
   it('requires a car\'s brand longer than 2 characters', () => {
-    const car = new Car({ brand: 'bb'});
-    const validationResult = car.validateSync();
-    const { message } = validationResult.errors.brand;
+    const ad = new Advertisement({ title: 'bb'});
+    const validationResult = ad.validateSync();
+    const { message } = validationResult.errors.title;
 
-    assert(message === 'Brand must be longer than 2 characters.');
+    assert(message === 'Title must be longer than 2 characters.');
   });
 
   it('disallows invalid records from being saved', (done) => {
-    const car = new Car({ brand: 'bb'});
-    car.save()
+    const ad = new Advertisement({ title: 'bb'});
+    ad.save()
       .catch((validationResult) => {
-        const { message } = validationResult.errors.brand;
+        const { message } = validationResult.errors.title;
 
-        assert(message === 'Brand must be longer than 2 characters.');
+        assert(message === 'Title must be longer than 2 characters.');
         done();
       });
   });

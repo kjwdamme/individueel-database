@@ -1,9 +1,9 @@
 const assert = require('assert');
-const Car = require('../src/car');
+const Advertisement = require('../src/advertisement');
 
 describe('Creating records', () => {
-    it('saves a car', (done) => {
-      const bmw = new Car({ brand: 'BMW' })
+    it('saves a advertisement', (done) => {
+      const bmw = new Advertisement({ title: 'BMW' })
 
       bmw.save()
         .then(() => {

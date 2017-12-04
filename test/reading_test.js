@@ -1,27 +1,27 @@
 const assert = require('assert');
-const Car = require('../src/car');
+const Advertisement = require('../src/advertisement');
 
 describe('Reading cars out of the database', () => {
   let bmw;
 
   beforeEach((done) => {
-    bmw = new Car({ brand: 'BMW' });
+    bmw = new Advertisement({ title: 'BMW' });
     bmw.save()
       .then(() => done());
   });
 
   it('finds all cars with a brand of BMW', (done) => {
-    Car.find({ brand: 'BMW' })
-      .then((cars) => {
-        assert(cars[0]._id.toString() === bmw._id.toString());
+    Advertisement.find({ title: 'BMW' })
+      .then((ads) => {
+        assert(ads[0]._id.toString() === bmw._id.toString());
         done();
       });
   });
 
   it('find a car with a particular id', (done) => {
-    Car.findOne({ _id: bmw._id })
-      .then((user) => {
-        assert(user.brand === 'BMW');
+    Advertisement.findOne({ _id: bmw._id })
+      .then((ad) => {
+        assert(ad.title === 'BMW');
         done();
       })
   })
