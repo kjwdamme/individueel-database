@@ -52,6 +52,6 @@ describe('Updating records', () => {
   });
 
   it('A car van have their numberOfPreviousOwners incremented by 1', () => {
-    
+
   });
 });
