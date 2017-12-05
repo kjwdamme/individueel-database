@@ -14,7 +14,6 @@ routes.get('/advertisements', function (req, res) {
     res.contentType('application/json');
 
     Advertisement.find({})
-      .populate('car')
       .then(function (ads) {
         res.status(200).json(ads);
       })
