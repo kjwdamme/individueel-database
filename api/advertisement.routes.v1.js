@@ -107,21 +107,28 @@ routes.post('/advertisements', function (req, res) {
 //
 // Vorm van de URL: PUT http://hostname:3000/api/v1/users/23
 //
-// routes.put('/recipes/:id', function (req, res) {
-//     var recipeId = req.params.id;
-//     Recipe.findOneAndUpdate({
-//         _id: recipeId
-//     }, {$set: {
-//         name: req.body.name,
-//         description: req.body.description,
-//         imagePath: req.body.imagePath,
-//         ingredients: req.body.ingredients
-//     }}).then(function (recipe) {
-//         res.status(200). json(recipe);
-//     }).catch((error) => {
-//         res.status(400).json(error);
-//     })
-// });
+routes.put('/advertisements/:id', function (req, res) {
+    var adId = req.params.id;
+    var body = req.body;
+    Advertisement.findOneAndUpdate({
+        _id: adId
+    }, {$set: {
+        title: body.title,
+        description: body.description,
+        car: {
+          brand: body.car.brand,
+          buildYear: body.car.buildYear,
+          imagePath: body.car.imagePath,
+          licensePlate: body.car.licensePlate,
+          model: body.car.model,
+          type: body.car.type
+        }
+    }}).then(function (ad) {
+        res.status(200). json(ad);
+    }).catch((error) => {
+        res.status(400).json(error);
+    })
+});
 
 //
 // Verwijder een bestaande user.
