@@ -5,10 +5,9 @@ var express = require('express');
 var routes = express.Router();
 var mongodb = require('../config/mongo.db');
 var Advertisement = require('../src/advertisement');
-var Car = require('../src/car');
 
 //
-// Geef een lijst van alle users.
+// Return a list with all advertisements
 //
 routes.get('/advertisements', function (req, res) {
     res.contentType('application/json');
@@ -21,6 +20,50 @@ routes.get('/advertisements', function (req, res) {
         res.status(400).json(error);
       });
 });
+
+//
+// Return a list with advertisements of cars from a specific brand
+//
+
+routes.get('/advertisements/:brand', function(req, res) {
+  res.contentType('application/json');
+
+  var brandFromUrl = req.params.brand;
+
+  Advertisement.find({'car.brand': brandFromUrl})
+    .then(function (ads) {
+      res.status(200).json(ads);
+    })
+    .catch((error) => {
+      res.status(400).json(error);
+    });
+});
+
+//
+// Return a list with filter options givin in the body
+//
+
+// routes.get('/advertisements/:brand/:buildyear/:model/:type', function(req, res) {
+//   var brand = req.params.brand;
+//   var buildYear = req.params.buildyear;
+//   var model = req.params.model;
+//   //var color = req.params.color;
+//   var type = req.params.type;
+//
+//   Advertisement.find({
+//     'car.brand': brand,
+//     'car.buildYear': buildYear,
+//     'car.model': model,
+//     //'car.color': color,
+//     'car.type': type
+//   })
+//   .then(function (ads) {
+//     res.status(200).json(ads);
+//   })
+//   .catch((error) => {
+//     res.status(400).json(error);
+//   });
+// });
 
 //
 // Retourneer één specifieke users. Hier maken we gebruik van URL parameters.
@@ -43,7 +86,7 @@ routes.get('/advertisements', function (req, res) {
 // Voeg een advertentie toe. De nieuwe info wordt gestuurd via de body van de request message.
 // Vorm van de URL: POST http://hostname:3000/api/v1/advertisement
 //
-routes.post('/advertisement', function (req, res) {
+routes.post('/advertisements', function (req, res) {
     res.contentType('application/json');
 
     var body = req.body;
