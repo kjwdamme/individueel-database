@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const CarSchema = require('./car');
 const Schema = mongoose.Schema;
+const Car = require('../src/car');
 
 const AdvertisementSchema = new Schema({
   title: {
@@ -11,15 +12,23 @@ const AdvertisementSchema = new Schema({
     },
     required: [true, 'Title is required.']
   },
-  car: CarSchema
+  car: CarSchema,
+  description: String
 });
+
+// AdvertisementSchema.pre('remove', function(next) {
+//   const Car = mongoose.model('car');
+//
+//   Car.remove({ _id: { $in: this.car } })
+//     .then(() => next());
+//
+// });
+
 const Advertisement = mongoose.model('advertisement', AdvertisementSchema);
 
 // const ad = new Advertisement({
-//   title: 'Mooie bmw 3 serie',
-//   car: {
-//     brand: 'BMW'
-//   }
+//   title: 'bmw 3 serie te koop',
+//   description: 'Mooie bmw 3 serie. Met beetje werk rijdt weer helemaal 100%',
 // }).save();
 
 module.exports = Advertisement;

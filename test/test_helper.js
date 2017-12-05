@@ -16,6 +16,6 @@ before((done) => {
 
 beforeEach((done) => {
   mongoose.connection.collections.advertisements.drop(() => {
-      done();
+    done();
   });
 });

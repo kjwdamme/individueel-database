@@ -5,6 +5,7 @@ var express = require('express');
 var routes = express.Router();
 var mongodb = require('../config/mongo.db');
 var Advertisement = require('../src/advertisement');
+var Car = require('../src/car');
 
 //
 // Geef een lijst van alle users.
@@ -13,12 +14,13 @@ routes.get('/advertisements', function (req, res) {
     res.contentType('application/json');
 
     Advertisement.find({})
-        .then(function (ads) {
-            res.status(200).json(ads);
-        })
-        .catch((error) => {
-            res.status(400).json(error);
-    });
+      .populate('car')
+      .then(function (ads) {
+        res.status(200).json(ads);
+      })
+      .catch((error) => {
+        res.status(400).json(error);
+      });
 });
 
 //
@@ -39,23 +41,22 @@ routes.get('/advertisements', function (req, res) {
 // });
 
 //
-// Voeg een user toe. De nieuwe info wordt gestuurd via de body van de request message.
-// Vorm van de URL: POST http://hostname:3000/api/v1/users
+// Voeg een advertentie toe. De nieuwe info wordt gestuurd via de body van de request message.
+// Vorm van de URL: POST http://hostname:3000/api/v1/advertisement
 //
-// routes.post('/recipes', function (req, res) {
-//     res.contentType('application/json');
-//
-//     var body = req.body;
-//     body.status = false;
-//
-//     Recipe.create(body, function(err, recipe) {
-//         if (err) {
-//             res.status(400).json(error);
-//         } else {
-//             res.status(200).json(recipe);
-//         }
-//     })
-// });
+routes.post('/advertisement', function (req, res) {
+    res.contentType('application/json');
+
+    var body = req.body;
+
+    Advertisement.create(body, function(err, ad) {
+        if (err) {
+            res.status(400).json(err);
+        } else {
+            res.status(200).json(ad);
+        }
+    });
+});
 
 //
 // Wijzig een bestaande user. De nieuwe info wordt gestuurd via de body van de request message.
