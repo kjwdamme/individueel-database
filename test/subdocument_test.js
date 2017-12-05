@@ -36,4 +36,23 @@ describe('Subdocuments', () => {
         done();
       });
   });
+
+  it('can remove an existing subdocument', (done) => {
+    const bmwAd = new Advertisement({
+      title: 'BMW Ad',
+      car: { brand: 'BMW'}
+    });
+
+    bmwAd.save()
+      .then(() => Advertisement.findOne({title: 'BMW Ad'}))
+      .then((ad) => {
+        ad.car.remove();
+        return ad.save();
+      })
+      .then(() => Advertisement.findOne({ title: 'BMW Ad'}))
+      .then((ad) => {
+        assert(ad.car === null);
+        done();
+      });
+  });
 });

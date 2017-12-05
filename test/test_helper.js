@@ -4,7 +4,7 @@ mongoose.Promise = global.Promise;
 
 before((done) => {
   mongoose.connect('mongodb://localhost/advertisements_test', {
-      useMongoClient: true
+    useMongoClient: true
   });
   mongoose.connection
       .once('open', () => { done(); })

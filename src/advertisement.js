@@ -15,4 +15,11 @@ const AdvertisementSchema = new Schema({
 });
 const Advertisement = mongoose.model('advertisement', AdvertisementSchema);
 
+// const ad = new Advertisement({
+//   title: 'Mooie bmw 3 serie',
+//   car: {
+//     brand: 'BMW'
+//   }
+// }).save();
+
 module.exports = Advertisement;
