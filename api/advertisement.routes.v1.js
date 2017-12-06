@@ -1,6 +1,3 @@
-//
-// ./api/v1/recipe.routes.v1.js
-//
 var express = require('express');
 var routes = express.Router();
 var mongodb = require('../config/mongo.db');
@@ -9,6 +6,7 @@ var Advertisement = require('../src/advertisement');
 //
 // Return a list with all advertisements
 //
+
 routes.get('/advertisements', function (req, res) {
     res.contentType('application/json');
 
@@ -22,10 +20,28 @@ routes.get('/advertisements', function (req, res) {
 });
 
 //
+// Return a advertisement from an id
+//
+
+routes.get('/advertisements/:id', function(req, res) {
+  res.contentType('application/json');
+
+  var id = req.params.id;
+
+  Advertisement.findOne({_id: id})
+    .then(function (ad) {
+      res.status(200).json(ad);
+    })
+    .catch((error) => {
+      res.status(400).json(error);
+    });
+});
+
+//
 // Return a list with advertisements of cars from a specific brand
 //
 
-routes.get('/advertisements/:brand', function(req, res) {
+routes.get('/advertisements/car/:brand', function(req, res) {
   res.contentType('application/json');
 
   var brandFromUrl = req.params.brand;
@@ -38,6 +54,8 @@ routes.get('/advertisements/:brand', function(req, res) {
       res.status(400).json(error);
     });
 });
+
+
 
 //
 // Return a list with filter options givin in the body
@@ -65,27 +83,11 @@ routes.get('/advertisements/:brand', function(req, res) {
 //   });
 // });
 
-//
-// Retourneer één specifieke users. Hier maken we gebruik van URL parameters.
-// Vorm van de URL: http://hostname:3000/api/v1/users/23
-//
-// routes.get('/recipes/:id', function (req, res) {
-//     res.contentType('application/json');
-//
-//     var recipeId = req.params.id;
-//
-//     Recipe.findOne({ _id: recipeId})
-//         .then(function (recipe) {
-//             res.status(200).json(recipe);
-//         }).catch((error) => {
-//             res.status(400).json(error);
-//         })
-// });
 
 //
-// Voeg een advertentie toe. De nieuwe info wordt gestuurd via de body van de request message.
-// Vorm van de URL: POST http://hostname:3000/api/v1/advertisement
+// Add an advertisement.
 //
+
 routes.post('/advertisements', function (req, res) {
     res.contentType('application/json');
 
@@ -101,12 +103,9 @@ routes.post('/advertisements', function (req, res) {
 });
 
 //
-// Wijzig een bestaande user. De nieuwe info wordt gestuurd via de body van de request message.
-// Er zijn twee manieren om de id van de users mee te geven: via de request parameters (doen we hier)
-// of als property in de request body.
+// Update an existing advertisement
 //
-// Vorm van de URL: PUT http://hostname:3000/api/v1/users/23
-//
+
 routes.put('/advertisements/:id', function (req, res) {
     var adId = req.params.id;
     var body = req.body;
@@ -131,21 +130,17 @@ routes.put('/advertisements/:id', function (req, res) {
 });
 
 //
-// Verwijder een bestaande user.
-// Er zijn twee manieren om de id van de users mee te geven: via de request parameters (doen we hier)
-// of als property in de request body.
+// Delete an advertisement
 //
-// Vorm van de URL: DELETE http://hostname:3000/api/v1/users/23
-//
-// routes.delete('/recipes/:id', function (req, res) {
-//     var recipeId = req.params.id;
-//
-//     Recipe.findOneAndRemove({ _id: recipeId})
-//         .then(function (recipe) {
-//             res.status(200).json({"response": "Successfully deleted"});
-//         }).catch((error) => {
-//         res.status(400).json(error);
-//     })
-// });
+routes.delete('/advertisements/:id', function (req, res) {
+    var advertId = req.params.id;
+
+    Advertisement.findOneAndRemove({ _id: advertId})
+        .then(function (recipe) {
+            res.status(200).json({"response": "Successfully deleted"});
+        }).catch((error) => {
+        res.status(400).json(error);
+    })
+});
 
 module.exports = routes;
