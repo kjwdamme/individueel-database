@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const CarSchema = require('./car');
+const OfferSchema = require('./offer');
 const Schema = mongoose.Schema;
 const Car = require('../src/car');
 
@@ -12,8 +13,10 @@ const AdvertisementSchema = new Schema({
     },
     required: [true, 'Title is required.']
   },
+  description: String,
   car: CarSchema,
-  description: String
+  offers: [OfferSchema]
+
 });
 
 // AdvertisementSchema.pre('remove', function(next) {

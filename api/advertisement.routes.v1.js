@@ -55,8 +55,6 @@ routes.get('/advertisements/car/:brand', function(req, res) {
     });
 });
 
-
-
 //
 // Return a list with filter options givin in the body
 //
@@ -82,7 +80,6 @@ routes.get('/advertisements/car/:brand', function(req, res) {
 //     res.status(400).json(error);
 //   });
 // });
-
 
 //
 // Add an advertisement.
@@ -121,8 +118,25 @@ routes.put('/advertisements/:id', function (req, res) {
           licensePlate: body.car.licensePlate,
           model: body.car.model,
           type: body.car.type
-        }
+        },
+        offers: body.offers
     }}).then(function (ad) {
+        res.status(200). json(ad);
+    }).catch((error) => {
+        res.status(400).json(error);
+    })
+});
+
+//
+// Add an offer to an advertisement
+//
+
+routes.put('/advertisements/:id/offer', function (req, res) {
+    var adId = req.params.id;
+    var body = req.body;
+    Advertisement.findOneAndUpdate({
+        _id: adId
+    }, {$push: {offers: body}}).then(function (ad) {
         res.status(200). json(ad);
     }).catch((error) => {
         res.status(400).json(error);
@@ -132,6 +146,7 @@ routes.put('/advertisements/:id', function (req, res) {
 //
 // Delete an advertisement
 //
+
 routes.delete('/advertisements/:id', function (req, res) {
     var advertId = req.params.id;
 
