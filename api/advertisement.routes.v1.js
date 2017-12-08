@@ -3,6 +3,10 @@ var routes = express.Router();
 var mongodb = require('../config/mongo.db');
 var Advertisement = require('../src/advertisement');
 
+var neo4j = require('neo4j-driver').v1;
+var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "neo4j"));
+var session = driver.session();
+
 //
 // Return a list with all advertisements
 //
@@ -54,6 +58,26 @@ routes.get('/advertisements/car/:brand', function(req, res) {
       res.status(400).json(error);
     });
 });
+
+routes.get('/engines', function(req, res) {
+  res.contentType('application/json');
+
+  session
+    .run("MATCH (n:Engine) RETURN n")
+    .then(function(result) {
+      var response = [];
+
+      result.records.forEach(function(record){
+        response.push(record._fields[0]);
+      });
+
+      res.status(200).json(response);
+    })
+    .catch((error) => {
+      res.status(400).json(error);
+    });
+});
+
 
 //
 // Return a list with filter options givin in the body
