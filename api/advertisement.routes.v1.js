@@ -2,6 +2,7 @@ var express = require('express');
 var routes = express.Router();
 var mongodb = require('../config/mongo.db');
 var Advertisement = require('../src/advertisement');
+const mongoose = require('mongoose');
 
 var neo4j = require('neo4j-driver').v1;
 var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "neo4j"));
@@ -58,52 +59,6 @@ routes.get('/advertisements/car/:brand', function(req, res) {
       res.status(400).json(error);
     });
 });
-
-routes.get('/engines', function(req, res) {
-  res.contentType('application/json');
-
-  session
-    .run("MATCH (n:Engine) RETURN n")
-    .then(function(result) {
-      var response = [];
-
-      result.records.forEach(function(record){
-        response.push(record._fields[0]);
-      });
-
-      res.status(200).json(response);
-    })
-    .catch((error) => {
-      res.status(400).json(error);
-    });
-});
-
-
-//
-// Return a list with filter options givin in the body
-//
-
-// routes.get('/advertisements/:brand/:buildyear/:model/:type', function(req, res) {
-//   var brand = req.params.brand;
-//   var buildYear = req.params.buildyear;
-//   var model = req.params.model;
-//   //var color = req.params.color;
-//   var type = req.params.type;
-//
-//   Advertisement.find({
-//     'car.brand': brand,
-//     'car.buildYear': buildYear,
-//     'car.model': model,
-//     //'car.color': color,
-//     'car.type': type
-//   })
-//   .then(function (ads) {
-//     res.status(200).json(ads);
-//   })
-//   .catch((error) => {
-//     res.status(400).json(error);
-//   });
-// });
 
 //
 // Add an advertisement.
@@ -181,5 +136,52 @@ routes.delete('/advertisements/:id', function (req, res) {
         res.status(400).json(error);
     })
 });
+
+//
+// Add advertisement id to neo4j database
+//
+
+routes.post('/favorites/:id', function (req, res) {
+  var id = req.params.id;
+
+  session
+    .run("CREATE(n:Advertisement {idFromMongo:{idParam}}) RETURN n.idFromMongo", {idParam: id})
+    .then(function(result) {
+      res.status(200).json({"response": "Successfully added to your favorites"});
+      session.close();
+    })
+    .catch((error) => {
+      res.status(400).json(error);
+    });
+});
+
+//
+// Get all favorites
+//
+
+routes.get('/favorites', function(req, res) {
+  //res.contentType('application/json');
+  var ids = [];
+  var advertisementsFromFavs = [];
+
+  session
+    .run("MATCH (n:Advertisement) RETURN n")
+    .then(function(result) {
+      result.records.forEach(function(record){
+        ids.push(record._fields[0].properties.idFromMongo);
+      });
+      //res.status(200).json(ids);
+      Advertisement.find({
+        '_id': { $in: ids}
+      }, function(err, docs){
+        res.status(200).json(docs);
+      })
+
+    })
+    .catch((error) => {
+      res.status(400).json(error);
+    })
+});
+
 
 module.exports = routes;
