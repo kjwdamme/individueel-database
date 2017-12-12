@@ -98,7 +98,7 @@ routes.put('/advertisements/:id', function (req, res) {
           model: body.car.model,
           type: body.car.type
         },
-        offers: body.offers
+        offers: []
     }}).then(function (ad) {
         res.status(200). json(ad);
     }).catch((error) => {
@@ -116,7 +116,7 @@ routes.put('/advertisements/:id/offer', function (req, res) {
     Advertisement.findOneAndUpdate({
         _id: adId
     }, {$push: {offers: body}}).then(function (ad) {
-        res.status(200). json(ad);
+        res.status(200).json(ad);
     }).catch((error) => {
         res.status(400).json(error);
     })
@@ -156,13 +156,31 @@ routes.post('/favorites/:id', function (req, res) {
 });
 
 //
+// Delete advertisement from favorites
+//
+
+routes.delete('/favorites/:id', function (req, res) {
+  var id = req.params.id;
+
+  session
+    .run("MATCH (n {idFromMongo: {idParam}}) DELETE n", {idParam: id})
+    .then(function(result) {
+      res.status(200).json({"response": "Successfully deleted from your favorites"});
+      session.close();
+    })
+    .catch((error) => {
+      res.status(400).json(error);
+    })
+})
+
+
+//
 // Get all favorites
 //
 
 routes.get('/favorites', function(req, res) {
   //res.contentType('application/json');
   var ids = [];
-  var advertisementsFromFavs = [];
 
   session
     .run("MATCH (n:Advertisement) RETURN n")
