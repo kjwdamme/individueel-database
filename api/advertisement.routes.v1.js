@@ -5,8 +5,8 @@ var Advertisement = require('../src/advertisement');
 const mongoose = require('mongoose');
 
 var neo4j = require('neo4j-driver').v1;
-//var driver = neo4j.driver("bolt://hobby-bholcepjgmiigbkeafnkgjal.dbs.graphenedb.com:24786", neo4j.auth.basic("advertisment-favorit", "b.YPw9Oy5dEuwc.ersqP7DXxnP4oMnL"));
-var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "neo4j"));
+var driver = neo4j.driver("bolt://hobby-bholcepjgmiigbkeafnkgjal.dbs.graphenedb.com:24786", neo4j.auth.basic("advertisment-favorit", "b.YPw9Oy5dEuwc.ersqP7DXxnP4oMnL"));
+//var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "neo4j"));
 var session = driver.session();
 
 
