@@ -17,21 +17,7 @@ const AdvertisementSchema = new Schema({
   car: CarSchema,
   offers: [OfferSchema]
 
-});
-
-// AdvertisementSchema.pre('remove', function(next) {
-//   const Car = mongoose.model('car');
-//
-//   Car.remove({ _id: { $in: this.car } })
-//     .then(() => next());
-//
-// });
-
+}, { strict: true });
 const Advertisement = mongoose.model('advertisement', AdvertisementSchema);
-
-// const ad = new Advertisement({
-//   title: 'bmw 3 serie te koop',
-//   description: 'Mooie bmw 3 serie. Met beetje werk rijdt weer helemaal 100%',
-// }).save();
 
 module.exports = Advertisement;

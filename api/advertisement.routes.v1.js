@@ -5,8 +5,10 @@ var Advertisement = require('../src/advertisement');
 const mongoose = require('mongoose');
 
 var neo4j = require('neo4j-driver').v1;
-var driver = neo4j.driver("bolt://hobby-bholcepjgmiigbkeafnkgjal.dbs.graphenedb.com:24786", neo4j.auth.basic("advertisment-favorit", "b.YPw9Oy5dEuwc.ersqP7DXxnP4oMnL"));
+//var driver = neo4j.driver("bolt://hobby-bholcepjgmiigbkeafnkgjal.dbs.graphenedb.com:24786", neo4j.auth.basic("advertisment-favorit", "b.YPw9Oy5dEuwc.ersqP7DXxnP4oMnL"));
+var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "neo4j"));
 var session = driver.session();
+
 
 //
 // Return a list with all advertisements
@@ -41,6 +43,68 @@ routes.get('/advertisements/:id', function(req, res) {
       res.status(400).json(error);
     });
 });
+
+routes.get('/advertisements/recommended/:brand', function(req, res) {
+  res.contentType('application/json');
+
+  var brandFromUrl = req.params.brand;
+  var advertisementIds = [];
+
+  Advertisement.find({'car.brand': brandFromUrl})
+    .then(function (ads) {
+      // res.status(200).json(ads);
+      ads.forEach(function (record) {
+        console.log('ids: ' + record._id)
+        session
+          .run("MERGE(a:Advertisement {idFromMongo: {idParam}, brand: {brandParam}}) WITH a MATCH(b: Advertisement {brand: {brandParam}}) MERGE(a)-[:SHARED_BRAND]->(b)", {idParam: record._id.toString(), brandParam: brandFromUrl})
+          .then(function(result) {
+            session
+              .run("MATCH (n:Advertisement{brand: {brandParam}}) RETURN (n)", {brandParam: brandFromUrl})
+              .then(function(result) {
+                result.records.forEach(function(record){
+                  advertisementIds.push(record._fields[0].properties);
+                });
+                res.status(200).json(advertisementIds);
+            })
+        })
+      });
+    })
+    .catch((error) => {
+      res.status(400).json(error);
+    });
+
+
+});
+
+// MATCH(a:Person {name:'Shawn'}),
+//      (b:Location {city:'Miami'})
+// MERGE(a)-[:BORN_IN {year:1978}]->(b)
+
+// routes.get('/blogposts/frontpage', function(req, res) {
+//   //res.contentType('application/json');
+//   var ids = [];
+//   var advertisementsFromFavs = [];
+//
+//   session
+//     .run("MATCH (n:BlogPost) RETURN n")
+//     .then(function(result) {
+//       result.records.forEach(function(record){
+//         ids.push(record._fields[0].properties.mongoId);
+//       });
+//       console.log(ids);
+//       return ids;
+//     })
+//     .then((ids)=>{
+//       BlogPost.find({_id: { $in: ids}})
+//           .then((blogPost) => {
+//           res.status(200).json(blogPost);
+//   })
+//     })
+//     .catch((error) => {
+//       res.status(400).json(error);
+//     })
+// });
+
 
 //
 // Return a list with advertisements of cars from a specific brand
@@ -145,7 +209,7 @@ routes.post('/favorites/:id', function (req, res) {
   var id = req.params.id;
 
   session
-    .run("CREATE(n:Advertisement {idFromMongo:{idParam}}) RETURN n.idFromMongo", {idParam: id})
+    .run("CREATE(n:Favorite {idFromMongo:{idParam}}) RETURN n.idFromMongo", {idParam: id})
     .then(function(result) {
       res.status(200).json({"response": "Successfully added to your favorites"});
       session.close();
@@ -154,6 +218,8 @@ routes.post('/favorites/:id', function (req, res) {
       res.status(400).json(error);
     });
 });
+
+
 
 //
 // Delete advertisement from favorites
@@ -183,7 +249,7 @@ routes.get('/favorites', function(req, res) {
   var ids = [];
 
   session
-    .run("MATCH (n:Advertisement) RETURN n")
+    .run("MATCH (n:Favorite) RETURN n")
     .then(function(result) {
       result.records.forEach(function(record){
         ids.push(record._fields[0].properties.idFromMongo);
