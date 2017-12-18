@@ -5,8 +5,8 @@ var Advertisement = require('../src/advertisement');
 const mongoose = require('mongoose');
 
 var neo4j = require('neo4j-driver').v1;
-var driver = neo4j.driver("bolt://hobby-bholcepjgmiigbkeafnkgjal.dbs.graphenedb.com:24786", neo4j.auth.basic("advertisment-favorit", "b.YPw9Oy5dEuwc.ersqP7DXxnP4oMnL"));
-//var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "neo4j"));
+//var driver = neo4j.driver("bolt://hobby-aedolckeehocgbkeebmanjal.dbs.graphenedb.com:24786", neo4j.auth.basic("koenscout48", "b.4lWceSn6Kh3c.cQ4LsRQaxjp7Qlud"));
+var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "neo4j"));
 var session = driver.session();
 
 
@@ -44,6 +44,8 @@ routes.get('/advertisements/:id', function(req, res) {
     });
 });
 
+
+
 routes.get('/advertisements/recommended/:brand', function(req, res) {
   res.contentType('application/json');
 
@@ -52,59 +54,30 @@ routes.get('/advertisements/recommended/:brand', function(req, res) {
 
   Advertisement.find({'car.brand': brandFromUrl})
     .then(function (ads) {
-      // res.status(200).json(ads);
       ads.forEach(function (record) {
         console.log('ids: ' + record._id)
         session
-          .run("MERGE(a:Advertisement {idFromMongo: {idParam}, brand: {brandParam}}) WITH a MATCH(b: Advertisement {brand: {brandParam}}) MERGE(a)-[:SHARED_BRAND]->(b)", {idParam: record._id.toString(), brandParam: brandFromUrl})
+          .run("MERGE(a:Advertisement {idFromMongo: {idParam}, brand: {brandParam}}) WITH a MATCH(b: Advertisement {brand: {brandParam}}) MERGE(a)-[:SHARED_BRAND]->(b) RETURN (b)", {idParam: record._id.toString(), brandParam: brandFromUrl})
           .then(function(result) {
-            session
-              .run("MATCH (n:Advertisement{brand: {brandParam}}) RETURN (n)", {brandParam: brandFromUrl})
-              .then(function(result) {
-                result.records.forEach(function(record){
-                  advertisementIds.push(record._fields[0].properties);
-                });
-                res.status(200).json(advertisementIds);
+            result.records.forEach(function(record){
+              advertisementIds.push(record._fields[0].properties.idFromMongo);
             })
+          })
+          .then((adverIds) => {
+            Advertisement.find({'_id': { $in: advertisementIds}})
+              .then(function (adverts) {
+                res.status(200).json(adverts);
+              })
+              .catch((error) => {
+                res.status(400).json(error);
+              })
+          })
         })
+      })
+      .catch((error) => {
+        res.status(400).json(error);
       });
-    })
-    .catch((error) => {
-      res.status(400).json(error);
-    });
-
-
 });
-
-// MATCH(a:Person {name:'Shawn'}),
-//      (b:Location {city:'Miami'})
-// MERGE(a)-[:BORN_IN {year:1978}]->(b)
-
-// routes.get('/blogposts/frontpage', function(req, res) {
-//   //res.contentType('application/json');
-//   var ids = [];
-//   var advertisementsFromFavs = [];
-//
-//   session
-//     .run("MATCH (n:BlogPost) RETURN n")
-//     .then(function(result) {
-//       result.records.forEach(function(record){
-//         ids.push(record._fields[0].properties.mongoId);
-//       });
-//       console.log(ids);
-//       return ids;
-//     })
-//     .then((ids)=>{
-//       BlogPost.find({_id: { $in: ids}})
-//           .then((blogPost) => {
-//           res.status(200).json(blogPost);
-//   })
-//     })
-//     .catch((error) => {
-//       res.status(400).json(error);
-//     })
-// });
-
 
 //
 // Return a list with advertisements of cars from a specific brand
@@ -160,7 +133,8 @@ routes.put('/advertisements/:id', function (req, res) {
           imagePath: body.car.imagePath,
           licensePlate: body.car.licensePlate,
           model: body.car.model,
-          type: body.car.type
+          type: body.car.type,
+          color: body.car.color
         },
         offers: []
     }}).then(function (ad) {
@@ -229,7 +203,7 @@ routes.delete('/favorites/:id', function (req, res) {
   var id = req.params.id;
 
   session
-    .run("MATCH (n {idFromMongo: {idParam}}) DELETE n", {idParam: id})
+    .run("MATCH (n:Favorite {idFromMongo: {idParam}}) DELETE n", {idParam: id})
     .then(function(result) {
       res.status(200).json({"response": "Successfully deleted from your favorites"});
       session.close();
